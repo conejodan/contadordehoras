@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Cotizador Solar</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body ng-app="app">
+  <div ng-controller="wesolar" class="container">
+    <h1>
+      Cotizador Solar
+    </h1>
+    <form class="col-xs-12 col-md-4">
+      <div class="row form-group">
+        <div class="col-xs-6">
+          Pago Mensual (Promedio):
+        </div>
+        <div class="col-xs-6">
+          <input type="number" class="form-control" ng-model="consumo_pesos" ng-change="calcular_tarifa()">
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-xs-6">
+          Consumo KWH (Promedio):
+        </div>
+        <div class="col-xs-6">
+          <input type="number" class="form-control" ng-model="consumo_kwh">
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-xs-6">
+          <label>Tarifa:</label>
+        </div>
+        <div class="col-xs-6">
+          <select ng-model="consumo_kwh_minimo" class="form-control">
+            <option ng-repeat="tarifa in tarifas" value="{{tarifa.costo_min}}">{{tarifa.tarifa}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-xs-6">
+          Capacidad Panel:
+        </div>
+        <div class="col-xs-6">
+          <input type="text" class="form-control" ng-model="capacidad_panel">
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-xs-6">
+          Precio Panel:
+        </div>
+        <div class="col-xs-6">
+          <input type="text" ng-model="precio_panel" class="form-control">
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-xs-6">
+          Costo Monitoreo:
+        </div>
+        <div class="col-xs-6">
+          <input type="text" ng-model="monitoreo" class="form-control">
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-xs-6">
+          Tipo de Cambio:
+        </div>
+        <div class="col-xs-6">
+          <input type="number" step="any" ng-model="tipo_cambio" class="form-control">
+        </div>
+      </div>
+      <div class="row form-group">
+        <div class="col-xs-6">
+          Descuento:
+        </div>
+        <div class="col-xs-6">
+          <input type="number" step="any" ng-model="descuento" class="form-control">
+        </div>
+      </div>
+      <div class="row form-group">
+        <button type="submit" class="btn btn-success" ng-click="calcular_consumo()">calcular </button>
+      </div>
+
+    </form>
+
+    <div class="col-xs-12 col-md-6">
+      <div class="col-xs-12">
+        <h2>
+          Propuesta
+        </h2>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Consumo</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.consumo | khw"></label>
+          </div>
+        </div>
+        <div class="row hidden">
+          <div class="col-xs-6">
+            <label>Consumo Total</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.consumo_total | khw"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Paneles</label>
+          </div>
+          <div class="col-xs-6">
+            <input type="number" class="form-control" ng-model="resultado.paneles" ng-change="recalcular()">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Nuevo Consumo</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.nuevo_consumo | khw"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Costo Paneles (USD)</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.costo_paneles | currency"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Subtotal (USD)</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.monto_total | currency"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Subtotal (MXN)</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.monto_total_inversion | currency"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>IVA 16%</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.monto_iva | currency"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Total</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.monto_iva + resultado.monto_total_inversion | currency"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Descuento</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.monto_descuento | currency"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <label>Total Inversion</label>
+          </div>
+          <div class="col-xs-6">
+            <label ng-bind="resultado.monto_final | currency"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/ngStorage.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

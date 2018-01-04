@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Bootstrap 101 Template</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body ng-app="app">
+  <div ng-controller="landing" class="container">
+    <h1>
+      TimeSheet! 
+      <button type="button" class="btn btn-{{ archivadas == 'true' ? 'warning': 'info'}}" ng-click="cambiararchi()">{{ archivadas == 'true' ? 'Archivadas': 'En Ejecucion'}}</button>
+      <button type="button" class="btn btn-success" ng-click="report = !report">Reporte</button>
+      <button type="button" class="btn btn-warning" ng-click="eliminarsession()">Borrar</button>
+    </h1>
+    <div class="col-sm-12">
+    <div class="col-sm-6">
+      <form name="miform" novalidate>
+  <div class="form-group">
+  <label>Actividad </label>
+  <input type="text" name="" class="form-control" ng-model="form.actividad" required>
+  </div>
+  <div class="form-group">
+    <label>Categoria </label>
+    <select ng-model="form.categoria" class="form-control">
+      <option value="">Seleccionar</option>
+      <option ng-repeat="categoria in categorias as total" value="{{categoria}}">{{categoria}}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Tiempo </label>
+    <input type="text" name="" class="form-control" ng-model="form.time" required>
+  </div>
+  <div class="form-group">
+    <label>Archivar </label>
+    <select ng-model="form.archivar" class="form-control">
+      <option value="false">No</option>
+      <option value="true">Si</option>
+    </select>
+  </div>
+  <button type="button" class="btn btn-primary" ng-disabled="!miform.$valid" ng-click="empezar(form.$valid)" ng-show="indi == -1">Agendar</button>
+  <button type="button" class="btn btn-success" ng-disabled="!miform.$valid" ng-click="update()" ng-show="indi >= 0 && !miform.$pristine">Update</button>
+  <button type="button" class="btn btn-info" ng-click="indi = -1" ng-show="indi >= 0">Limpiar</button>
+  </form>
+    </div>
+    <div class="col-sm-6">
+  Tiempo Total Horas por Semana: {{ totaltime / 60 / 60 | number:2 }}
+  <br>
+  Tiempo Total Horas por Dia: {{ totaltimebyday / 60 / 60 | number:2 }}
+    </div>
+      
+  
+    </div>
+    <div class="col-sm-12" ng-show="report">
+   <br>
+
+      <table class="table table-bordered">
+    
+    
+<thead>
+  <tr>
+    <th>Fecha</th>
+    <th>Actividad</th>
+    <th>Categoria</th>
+    <th>Minutos</th>
+    <th>Segundos</th>
+    <th></th>
+  </tr>
+</thead>
+<tbody>
+  <tr  ng-repeat="actividad in actividades | filter:{archivar : archivadas} as timesheet">
+    <td>{{actividad.fecha}}</td>
+    <td>{{actividad.actividad}}</td>
+    <td>{{actividad.categoria}}</td>
+    <td>{{actividad.time / 60 | number:1}}</td>
+    <td>{{actividad.time}}</td>
+    <td>
+      <button type="button" class="btn btn-warning" ng-show="archivadas == 'false'" ng-click="editar(actividad, $index)">Editar</button> 
+      <button type="button" class="btn btn-danger" ng-click="detener()" ng-show="actividad == inCount">Detener</button> 
+      <button type="button" class="btn btn-success" ng-click="startCount(actividad)" ng-show="actividad != inCount && archivadas == 'false'">Continuar</button> 
+      <button type="button" class="btn btn-info" ng-show="archivadas == 'false'" ng-click="cambiar(actividad)">Archivar</button>
+      <button type="button" class="btn btn-warning" ng-show="archivadas == 'true'" ng-click="createcopy(actividad)">Copiar</button>
+      <button type="button" class="btn btn-danger" ng-click="deleted($index)">Eliminar</button>
+    </td>
+  </tr>
+</tbody>
+</table>
+    </div>
+    <div class="col-sm-12" ng-hide="report">
+    <br>
+      <table class="table table-bordered">
+    
+    
+<thead>
+  <tr>
+    <th>Fecha</th>
+    <th>Minutos</th>
+    <th>Actividad</th>   
+  </tr>
+</thead>
+<tbody>
+  <tr  ng-repeat="actividad in actividades | filter:{archivar : 'false'}">
+    <td>{{actividad.fecha}}</td>
+    <td>{{actividad.time / 60 | number:1}}</td>
+    <td>{{actividad.actividad}}</td>   
+  </tr>
+</tbody>
+</table>
+    </div>
+    
+  <br>
+
+
+    
+  </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/ngStorage.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
